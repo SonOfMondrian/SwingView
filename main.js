@@ -23,11 +23,33 @@ const delayInput = document.getElementById('delay-input');
 const mirrorBtn = document.getElementById('btn-mirror');
 const socket = io();
 
-// --- Lobby Logic ---
+// --- Lobby & Device Selection ---
+const deviceSelector = document.getElementById('device-selector');
+const selectPcBtn = document.getElementById('select-pc');
+const selectPhoneBtn = document.getElementById('select-phone');
 const lobby = document.getElementById('lobby');
 const appUI = document.getElementById('app');
 const roomCodeInput = document.getElementById('room-code');
 const joinBtn = document.getElementById('btn-join');
+const backHomeBtn = document.getElementById('btn-back-home');
+
+// Device Selection Logic
+selectPcBtn.addEventListener('click', () => {
+    deviceSelector.classList.add('hidden');
+    lobby.classList.remove('hidden');
+});
+
+selectPhoneBtn.addEventListener('click', () => {
+    window.location.href = '/sender';
+});
+
+// Back to Home Logic
+if (backHomeBtn) {
+    backHomeBtn.addEventListener('click', () => {
+        lobby.classList.add('hidden');
+        deviceSelector.classList.remove('hidden');
+    });
+}
 
 // --- Security Helper ---
 async function hashRoomCode(code) {

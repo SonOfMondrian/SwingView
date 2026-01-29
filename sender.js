@@ -16,6 +16,14 @@ const lobby = document.getElementById('lobby');
 const mainUI = document.getElementById('main-ui');
 const roomCodeInput = document.getElementById('room-code');
 const btnJoin = document.getElementById('btn-join');
+const btnBackHome = document.getElementById('btn-back-home');
+
+// Back to Home Logic
+if (btnBackHome) {
+    btnBackHome.addEventListener('click', () => {
+        window.location.href = '/';
+    });
+}
 
 // --- Security Helper ---
 async function hashRoomCode(code) {

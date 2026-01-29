@@ -11,6 +11,105 @@
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap"
         rel="stylesheet">
     <style>
+        #device-selector {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0e14;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #device-selector h2 {
+            margin-bottom: 40px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-size: 1.8rem;
+            word-break: keep-all;
+        }
+
+        .selection-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            justify-content: center;
+        }
+
+        .device-btn {
+            flex: 1;
+            min-width: 280px;
+            padding: 40px 20px;
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: #fff;
+            text-align: center;
+        }
+
+        .device-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 255, 136, 0.08);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.15);
+        }
+
+        .device-btn .icon {
+            font-size: 4.5rem;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
+        }
+
+        .device-btn .title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            word-break: keep-all;
+        }
+
+        .device-btn .desc {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 15px;
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+
+        @media (max-width: 700px) {
+            .selection-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .device-btn {
+                width: 100%;
+                min-width: unset;
+                padding: 30px 20px;
+            }
+
+            #device-selector h2 {
+                font-size: 1.4rem;
+                margin-bottom: 30px;
+            }
+        }
+
         #lobby {
             position: fixed;
             top: 0;
@@ -56,6 +155,17 @@
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         }
 
+        #room-code::placeholder {
+            font-size: 0.9rem;
+            letter-spacing: 0;
+            color: #555;
+        }
+
+        .lobby-controls {
+            display: flex;
+            gap: 15px;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -63,12 +173,32 @@
 </head>
 
 <body>
-    <div id="lobby">
+    <div id="device-selector">
+        <h2>어떤 장치로 접속하셨나요?</h2>
+        <div class="selection-container">
+            <div id="select-pc" class="device-btn">
+                <div class="icon">💻</div>
+                <div class="title">노트북 / 태블릿</div>
+                <div class="desc">정면 스윙 확인용 (메인 화면)</div>
+            </div>
+            <div id="select-phone" class="device-btn">
+                <div class="icon">📱</div>
+                <div class="title">스마트폰</div>
+                <div class="desc">측면 스윙 촬영용 (카메라 전송)</div>
+            </div>
+        </div>
+        <div class="developer-info">개발자:이정민 | 개발일자: 2026.01.30</div>
+    </div>
+
+    <div id="lobby" class="hidden">
         <h2>비밀 코드 입력</h2>
         <div class="code-input-container">
             <input type="password" id="room-code" placeholder="비밀 코드를 입력하세요">
         </div>
-        <button id="btn-join" class="primary-btn">입장하기</button>
+        <div class="lobby-controls">
+            <button id="btn-back-home" class="secondary-btn">처음으로</button>
+            <button id="btn-join" class="primary-btn">입장하기</button>
+        </div>
         <div class="developer-info">개발자:이정민 | 개발일자: 2026.01.30</div>
     </div>
 
