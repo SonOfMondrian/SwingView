@@ -20,28 +20,36 @@ app.use(express.static(__dirname));
 // Socket.IO Connection Logic
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
-
-    socket.join('camera-room');
+    let userRoom = null;
 
     socket.on('join', (room) => {
+        if (userRoom) {
+            socket.leave(userRoom);
+        }
+        userRoom = room;
         socket.join(room);
-        console.log(`Socket ${socket.id} joined ${room}`);
+        console.log(`Socket ${socket.id} joined room: ${room}`);
     });
 
-    // Relay 'offer' from sender to receiver
+    // Relay 'offer' from sender to receiver in the same room
     socket.on('offer', (data) => {
-        // Broadcast to others in the room
-        socket.to('camera-room').emit('offer', data);
+        if (userRoom) {
+            socket.to(userRoom).emit('offer', data);
+        }
     });
 
-    // Relay 'answer' from receiver to sender
+    // Relay 'answer' from receiver to sender in the same room
     socket.on('answer', (data) => {
-        socket.to('camera-room').emit('answer', data);
+        if (userRoom) {
+            socket.to(userRoom).emit('answer', data);
+        }
     });
 
-    // Relay 'ice-candidate'
+    // Relay 'ice-candidate' in the same room
     socket.on('ice-candidate', (data) => {
-        socket.to('camera-room').emit('ice-candidate', data);
+        if (userRoom) {
+            socket.to(userRoom).emit('ice-candidate', data);
+        }
     });
 
     socket.on('disconnect', () => {

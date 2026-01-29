@@ -11,9 +11,27 @@ const config = {
     ]
 };
 
-socket.emit('join', 'camera-room');
+// --- Lobby Logic ---
+const lobby = document.getElementById('lobby');
+const mainUI = document.getElementById('main-ui');
+const roomCodeInput = document.getElementById('room-code');
+const btnJoin = document.getElementById('btn-join');
 
-startBtn.addEventListener('click', async () => {
+btnJoin.addEventListener('click', async () => {
+    const code = roomCodeInput.value.trim();
+    if (code.length === 4) {
+        socket.emit('join', code);
+        lobby.classList.add('hidden');
+        mainUI.classList.remove('hidden');
+
+        // 자동 시작 (휴대폰 카메라)
+        startCamera();
+    } else {
+        alert("4자리 숫자를 입력해 주세요.");
+    }
+});
+
+async function startCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -25,7 +43,6 @@ startBtn.addEventListener('click', async () => {
         });
         localVideo.srcObject = stream;
         localStream = stream;
-        startBtn.style.display = 'none';
         statusDiv.innerText = "Camera Active. Connecting to Laptop...";
 
         // Initiate Connection (Caller)
@@ -35,7 +52,7 @@ startBtn.addEventListener('click', async () => {
         console.error('Error accessing media devices.', err);
         alert('Camera access failed: ' + err.name);
     }
-});
+}
 
 async function createOffer() {
     if (peerConnection) peerConnection.close(); // Clean up previous connection

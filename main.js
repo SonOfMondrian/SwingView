@@ -13,13 +13,39 @@ const statusBadge = document.getElementById('status-badge');
 const bufferStat = document.getElementById('buffer-stat');
 
 let stream = null;
-let isRunning = false;
+let isLocalCameraActive = false; // 내 카메라 상태만 관리
+let isAppRunning = false;       // 전체 앱(루프) 실행 상태
 let animationFrameId = null;
 let frameBuffer = [];       // Local buffer
 let remoteFrameBuffer = []; // Remote buffer
 let DELAY_MS = 2000; // Default 2 seconds
 const delayInput = document.getElementById('delay-input');
 const mirrorBtn = document.getElementById('btn-mirror');
+const socket = io();
+
+// --- Lobby Logic ---
+const lobby = document.getElementById('lobby');
+const appUI = document.getElementById('app');
+const roomCodeInput = document.getElementById('room-code');
+const joinBtn = document.getElementById('btn-join');
+
+joinBtn.addEventListener('click', () => {
+    const code = roomCodeInput.value.trim();
+    if (code.length === 4) {
+        socket.emit('join', code);
+        lobby.classList.add('hidden');
+        appUI.classList.remove('hidden');
+
+        // 앱 실행 및 렌더링 루프 시작
+        isAppRunning = true;
+        processFrame();
+
+        // 노트북 카메라도 기본적으로 시작 (원치 않으면 나중에 버튼으로 끌 수 있음)
+        startCamera();
+    } else {
+        alert("4자리 숫자를 입력해 주세요.");
+    }
+});
 
 // Mirror Toggle Event
 mirrorBtn.addEventListener('click', () => {
@@ -47,8 +73,8 @@ delayInput.addEventListener('change', (e) => {
     DELAY_MS = val * 1000;
 
     // Update badge text
-    if (isRunning) {
-        statusBadge.textContent = `작동 중 (${val}초 지연)`;
+    if (isAppRunning) {
+        statusBadge.textContent = isLocalCameraActive ? `작동 중 (${val}초 지연)` : `스마트폰 대기 중 (${val}초 지연)`;
     }
 
     // 지연 시간 변경 시 버퍼 초기화 (이전 지연 데이터 삭제)
@@ -63,10 +89,7 @@ async function startCamera() {
     console.log("startCamera called");
     // 보안 컨텍스트 확인 (HTTP 접속 시 navigator.mediaDevices가 없음)
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("보안 오류: 현재 보안되지 않은 연결(HTTP)로 접속 중입니다.\n\n" +
-            "해결 방법:\n" +
-            "1. HTTPS 주소로 접속하세요.\n" +
-            "2. 안드로이드는 Chrome 설정(chrome://flags)에서 현재 주소를 'Insecure origins treated as secure'에 등록하세요.");
+        alert("보안 오류: HTTPS 연결이 필요합니다.");
         return;
     }
 
@@ -89,12 +112,10 @@ async function startCamera() {
 
             try {
                 await videoElement.play();
-                isRunning = true;
-                isRunning = true;
+                isLocalCameraActive = true;
                 const currentDelay = delayInput.value;
                 statusBadge.textContent = `작동 중 (${currentDelay}초 지연)`;
                 statusBadge.style.color = "var(--primary-color)";
-                processFrame();
 
                 startBtn.classList.add('hidden');
                 stopBtn.classList.remove('hidden');
@@ -110,38 +131,36 @@ async function startCamera() {
 
 // Stop Camera
 function stopCamera() {
-    isRunning = false;
+    isLocalCameraActive = false;
     if (stream) {
         stream.getTracks().forEach(track => track.stop());
         stream = null;
     }
-    if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-    }
 
-    // Clear buffer
+    // 노트북 카메라 버퍼만 비우기
     frameBuffer.forEach(item => {
         if (item.bitmap) item.bitmap.close();
     });
     frameBuffer = [];
 
+    // 캔버스 지우기
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    statusBadge.textContent = "중지됨";
+
+    statusBadge.textContent = "노트북 카메라 중지됨";
     statusBadge.style.color = "var(--text-main)";
 
     startBtn.classList.remove('hidden');
     stopBtn.classList.add('hidden');
-    bufferStat.innerText = "0f";
 }
 
 // Process Frames Loop (Dual Stream)
 async function processFrame() {
-    if (!isRunning) return;
+    if (!isAppRunning) return; // 앱 자체가 꺼진 게 아니면 계속 실행
 
     const now = performance.now();
 
-    // 1. Capture Frames (Local)
-    if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+    // 1. Capture Frames (Local - 활성화된 경우만)
+    if (isLocalCameraActive && videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
         try {
             const bitmap = await createImageBitmap(videoElement);
             frameBuffer.push({ bitmap: bitmap, time: now });
@@ -198,7 +217,6 @@ stopBtn.addEventListener('click', stopCamera);
 
 // --- Socket.IO & WebRTC (Remote Camera) ---
 // socket and remoteVideo are already declared at the top
-const socket = io(); // This line was not removed as it's the first declaration of `socket`
 let peerConnection;
 const rtcConfig = {
     iceServers: [
@@ -207,7 +225,8 @@ const rtcConfig = {
     ]
 };
 
-socket.emit('join', 'camera-room'); // Join the room
+
+// 룸 입장은 로비 로직에서 처리함
 
 // Laptop waits for an offer from the Phone
 let iceCandidatesBuffer = [];
