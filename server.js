@@ -12,7 +12,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer);
 
 // Constants
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Serve static files from the current directory
 app.use(express.static(__dirname));

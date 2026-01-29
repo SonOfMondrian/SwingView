@@ -60,6 +60,7 @@ delayInput.addEventListener('change', (e) => {
 
 // Start Camera
 async function startCamera() {
+    console.log("startCamera called");
     // 보안 컨텍스트 확인 (HTTP 접속 시 navigator.mediaDevices가 없음)
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert("보안 오류: 현재 보안되지 않은 연결(HTTP)로 접속 중입니다.\n\n" +
@@ -70,15 +71,16 @@ async function startCamera() {
     }
 
     try {
+        console.log("Requesting camera access...");
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 width: { ideal: 1280 },
                 height: { ideal: 720 },
-                frameRate: { ideal: 60 },
-                facingMode: "user" // 스마트폰 전면 카메라 사용
+                facingMode: { ideal: "user" }
             },
             audio: false
         });
+        console.log("Camera access granted");
         videoElement.srcObject = stream;
 
         videoElement.onloadedmetadata = async () => {
