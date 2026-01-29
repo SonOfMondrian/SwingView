@@ -1,0 +1,296 @@
+:root {
+    --primary-color: #00ff88;
+    --secondary-color: #00d4ff;
+    --bg-dark: #0a0e14;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #e0e6ed;
+    --accent-red: #ff3e3e;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Rajdhani', sans-serif;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#app {
+    width: 100%;
+    max-width: none;
+    /* Full width */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    /* Reduced padding */
+    gap: 10px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    /* Keep header constrained */
+    margin: 0 auto;
+    /* Center the header */
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+}
+
+h1 span {
+    color: var(--primary-color);
+}
+
+
+.controls-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--glass-bg);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+#delay-input {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+    width: 60px;
+    text-align: right;
+    outline: none;
+}
+
+#delay-input:focus {
+    color: #fff;
+}
+
+.unit {
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+main {
+    flex: 1;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--glass-border);
+}
+
+.video-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* #output-canvas removed here, moved to .cam-view class */
+
+.camera-grid {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 10px;
+}
+
+.gutter {
+    width: 10px;
+    height: 100%;
+    background: #111;
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gutter:hover,
+.gutter:active {
+    background: var(--primary-color);
+}
+
+.gutter::after {
+    content: '';
+    width: 2px;
+    height: 30px;
+    background: #555;
+    border-radius: 2px;
+}
+
+.gutter:hover::after {
+    background: #000;
+}
+
+.cam-view {
+    position: relative;
+    flex: 1;
+    /* Default equal width */
+    height: 100%;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #333;
+    min-width: 150px;
+    /* Prevent collapse */
+}
+
+.cam-view canvas,
+.cam-view video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Don't stretch */
+}
+
+/* Mirror Utility Class */
+.mirrored {
+    transform: scaleX(-1);
+}
+
+.small-btn {
+    padding: 5px 12px;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    border-radius: 15px;
+}
+
+.cam-label {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 5;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.overlay-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 15;
+}
+
+.info-panel {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    padding: 15px 25px;
+    border-radius: 15px;
+    display: flex;
+    gap: 40px;
+    width: fit-content;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat label {
+    font-size: 0.7rem;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+.stat span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.primary-btn {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #000;
+}
+
+.primary-btn:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    transform: translateY(-2px);
+}
+
+.secondary-btn {
+    background: var(--glass-bg);
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
+}
+
+.secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    #app {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+    }
+
+    .info-panel {
+        padding: 5px 15px;
+        gap: 15px;
+    }
+
+    .stat span {
+        font-size: 1rem;
+    }
+}

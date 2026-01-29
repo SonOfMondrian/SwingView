@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Delay View</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1>GOLF <span>DELAY VIEW</span></h1>
+            <div class="controls-group">
+                <input type="number" id="delay-input" min="1" max="10" step="0.5" value="2.0">
+                <span class="unit">sec</span>
+                <button id="btn-mirror" class="secondary-btn small-btn">반전</button>
+            </div>
+            <div id="status-badge" class="badge">준비 완료</div>
+        </header>
+
+        <main>
+            <div class="video-container">
+                <!-- Hidden video element to capture raw camera feed -->
+                <video id="input-video" playsinline muted autoplay
+                    style="position: absolute; opacity: 0; pointer-events: none;"></video>
+                <!-- Canvas to display the delayed frames (Main/Front) -->
+                <div class="camera-grid" id="camera-container">
+                    <div class="cam-view" id="view-left">
+                        <span class="cam-label">FRONT (Laptop)</span>
+                        <canvas id="output-canvas"></canvas>
+                    </div>
+
+                    <!-- Drag Handle -->
+                    <div class="gutter" id="drag-gutter"></div>
+
+                    <div class="cam-view" id="view-right">
+                        <span class="cam-label">SIDE (Phone)</span>
+                        <canvas id="remote-canvas"></canvas>
+                    </div>
+                </div>
+                <!-- Hidden video to receive WebRTC stream (Invisible but active to avoid throttling) -->
+                <video id="remote-video" autoplay playsinline muted
+                    style="position: absolute; opacity: 0; pointer-events: none;"></video>
+
+                <div class="overlay-controls">
+                    <div class="info-panel">
+                        <!-- 
+                        <div class="stat">
+                            <label>DELAY</label>
+                            <span id="delay-time">2.0s</span>
+                        </div>
+                        -->
+                        <div class="stat">
+                            <label>BUFFER</label>
+                            <span id="buffer-stat">0f</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="start-btn" class="primary-btn">카메라 시작</button>
+            <button id="stop-btn" class="secondary-btn hidden">중지</button>
+        </footer>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

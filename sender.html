@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Sender</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+
+        video {
+            width: 100%;
+            max-width: 600px;
+            background: #222;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: #333;
+            margin-bottom: 20px;
+        }
+
+        .connected {
+            background: #28a745;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="status" class="status">Waiting for connection...</div>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <button id="startBtn">Connect & Start Camera</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="sender.js"></script>
+</body>
+
+</html>
