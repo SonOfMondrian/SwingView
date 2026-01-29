@@ -82,6 +82,15 @@
         .hidden {
             display: none !important;
         }
+
+        .developer-info {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #555;
+            text-align: center;
+            font-family: sans-serif;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 
@@ -90,12 +99,14 @@
         <h2>스마트폰 전송: 코드 입력</h2>
         <input type="password" id="room-code" placeholder="비밀 코드를 입력하세요">
         <button id="btn-join">입장 및 시작</button>
+        <div class="developer-info">개발자:이정민 | 개발일자: 2026.01.30</div>
     </div>
 
     <div id="main-ui" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
         <div id="status" class="status">연결 대기 중...</div>
         <video id="localVideo" autoplay playsinline muted></video>
         <button id="startBtn" class="hidden">연결 및 카메라 시작</button>
+        <div class="developer-info">개발자:이정민 | 개발일자: 2026.01.30</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
