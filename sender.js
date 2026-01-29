@@ -17,17 +17,27 @@ const mainUI = document.getElementById('main-ui');
 const roomCodeInput = document.getElementById('room-code');
 const btnJoin = document.getElementById('btn-join');
 
+// --- Security Helper ---
+async function hashRoomCode(code) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code + "swing_view_salt_v1"); // main.js와 동일한 솔트 사용
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 btnJoin.addEventListener('click', async () => {
     const code = roomCodeInput.value.trim();
-    if (code.length === 4) {
-        socket.emit('join', code);
+    if (code.length >= 2) {
+        const hashedCode = await hashRoomCode(code);
+        socket.emit('join', hashedCode);
         lobby.classList.add('hidden');
         mainUI.classList.remove('hidden');
 
         // 자동 시작 (휴대폰 카메라)
         startCamera();
     } else {
-        alert("4자리 숫자를 입력해 주세요.");
+        alert("최소 2자 이상의 비밀 코드를 입력해 주세요.");
     }
 });
 
@@ -43,14 +53,14 @@ async function startCamera() {
         });
         localVideo.srcObject = stream;
         localStream = stream;
-        statusDiv.innerText = "Camera Active. Connecting to Laptop...";
+        statusDiv.innerText = "카메라 활성화됨. 노트북 연결 중...";
 
         // Initiate Connection (Caller)
         createOffer();
 
     } catch (err) {
         console.error('Error accessing media devices.', err);
-        alert('Camera access failed: ' + err.name);
+        alert('카메라 접근 실패: ' + err.name);
     }
 }
 
@@ -63,11 +73,14 @@ async function createOffer() {
     // Monitoring
     peerConnection.onconnectionstatechange = () => {
         const state = peerConnection.connectionState;
-        statusDiv.innerText = "State: " + state;
+        statusDiv.innerText = "상태: " + state;
         console.log("Connection State:", state);
 
-        if (state === 'failed' || state === 'disconnected') {
-            statusDiv.innerText = "Connection failed. Retrying in 3s...";
+        if (state === 'connected') {
+            statusDiv.innerText = "노트북 연결됨";
+            statusDiv.classList.add('connected');
+        } else if (state === 'failed' || state === 'disconnected') {
+            statusDiv.innerText = "연결 실패. 3초 후 재시도...";
             statusDiv.classList.remove('connected');
 
             setTimeout(() => {

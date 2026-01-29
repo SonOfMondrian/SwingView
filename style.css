@@ -59,6 +59,17 @@ h1 span {
     color: var(--primary-color);
 }
 
+.room-badge {
+    font-size: 0.9rem;
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--primary-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    vertical-align: middle;
+}
+
 
 .controls-group {
     display: flex;
@@ -85,6 +96,12 @@ h1 span {
 
 #delay-input:focus {
     color: #fff;
+}
+
+.label-text {
+    font-size: 0.85rem;
+    color: #888;
+    margin-right: -5px;
 }
 
 .unit {

@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,6 +9,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+}));
+
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
@@ -67,6 +73,5 @@ app.get('/sender', (req, res) => {
 });
 
 httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-    console.log(`Ensure both devices are on the same Wi-Fi.`);
+    console.log(`Server running at port ${PORT}`);
 });

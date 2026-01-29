@@ -66,16 +66,16 @@
         }
 
         #room-code {
-            width: 180px;
+            width: 250px;
             height: 60px;
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid #333;
             border-radius: 10px;
             color: #fff;
-            font-size: 2rem;
+            font-size: 1.5rem;
             text-align: center;
             outline: none;
-            letter-spacing: 10px;
+            letter-spacing: 2px;
             margin-bottom: 20px;
         }
 
@@ -87,15 +87,15 @@
 
 <body>
     <div id="lobby">
-        <h2>SENDER: ENTER CODE</h2>
-        <input type="text" maxlength="4" id="room-code" placeholder="----">
-        <button id="btn-join">JOIN & START</button>
+        <h2>스마트폰 전송: 코드 입력</h2>
+        <input type="password" id="room-code" placeholder="비밀 코드를 입력하세요">
+        <button id="btn-join">입장 및 시작</button>
     </div>
 
     <div id="main-ui" class="hidden" style="display: flex; flex-direction: column; align-items: center;">
-        <div id="status" class="status">Waiting for connection...</div>
+        <div id="status" class="status">연결 대기 중...</div>
         <video id="localVideo" autoplay playsinline muted></video>
-        <button id="startBtn" class="hidden">Connect & Start Camera</button>
+        <button id="startBtn" class="hidden">연결 및 카메라 시작</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

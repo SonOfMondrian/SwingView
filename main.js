@@ -29,10 +29,25 @@ const appUI = document.getElementById('app');
 const roomCodeInput = document.getElementById('room-code');
 const joinBtn = document.getElementById('btn-join');
 
-joinBtn.addEventListener('click', () => {
+// --- Security Helper ---
+async function hashRoomCode(code) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code + "swing_view_salt_v1"); // 고유 솔트 추가
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+joinBtn.addEventListener('click', async () => {
     const code = roomCodeInput.value.trim();
-    if (code.length === 4) {
-        socket.emit('join', code);
+    if (code.length >= 2) {
+        const hashedCode = await hashRoomCode(code);
+        socket.emit('join', hashedCode);
+
+        // 방 번호 표시 (실제 비밀번호 대신 해시 일부만 표시)
+        const displayRoomCode = document.getElementById('display-room-code');
+        if (displayRoomCode) displayRoomCode.innerText = `#${hashedCode.substring(0, 6)}`;
+
         lobby.classList.add('hidden');
         appUI.classList.remove('hidden');
 
@@ -43,7 +58,7 @@ joinBtn.addEventListener('click', () => {
         // 노트북 카메라도 기본적으로 시작 (원치 않으면 나중에 버튼으로 끌 수 있음)
         startCamera();
     } else {
-        alert("4자리 숫자를 입력해 주세요.");
+        alert("최소 2자 이상의 비밀 코드를 입력해 주세요.");
     }
 });
 
@@ -205,8 +220,10 @@ async function processFrame() {
         remoteFrame.bitmap.close();
     }
 
-    // Update stats (Local buffer size)
-    bufferStat.innerText = `L:${frameBuffer.length}f / R:${remoteFrameBuffer.length}f`;
+    // Update stats (Local buffer size in seconds, assuming ~60fps)
+    const lSec = (frameBuffer.length / 60).toFixed(1);
+    const rSec = (remoteFrameBuffer.length / 60).toFixed(1);
+    bufferStat.innerText = `정면:${lSec}초 / 측면:${rSec}초`;
 
     animationFrameId = requestAnimationFrame(processFrame);
 }
