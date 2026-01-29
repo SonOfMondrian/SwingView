@@ -64,35 +64,62 @@ async function startCamera() {
     }
 }
 
+let retryTimer = null;
+
 async function createOffer() {
-    if (peerConnection) peerConnection.close(); // Clean up previous connection
-    console.log("Creating Offer...");
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+
+    // 기존 타이머 취소
+    if (retryTimer) {
+        clearTimeout(retryTimer);
+        retryTimer = null;
+    }
+
+    console.log("Creating Offer (Connecting to Laptop...)");
+    statusDiv.innerText = "노트북 연결 중...";
 
     peerConnection = new RTCPeerConnection(config);
 
     // Monitoring
     peerConnection.onconnectionstatechange = () => {
         const state = peerConnection.connectionState;
-        statusDiv.innerText = "상태: " + state;
         console.log("Connection State:", state);
 
         if (state === 'connected') {
             statusDiv.innerText = "노트북 연결됨";
             statusDiv.classList.add('connected');
+            if (retryTimer) {
+                clearTimeout(retryTimer);
+                retryTimer = null;
+            }
         } else if (state === 'failed' || state === 'disconnected') {
             statusDiv.innerText = "연결 실패. 3초 후 재시도...";
             statusDiv.classList.remove('connected');
 
-            setTimeout(() => {
+            if (retryTimer) clearTimeout(retryTimer);
+            retryTimer = setTimeout(() => {
                 createOffer();
             }, 3000);
         }
     };
 
+    // 3초 후에도 연결되지 않으면 재시도 (노트북이 아직 접속 안 했을 때 대비)
+    retryTimer = setTimeout(() => {
+        if (peerConnection && peerConnection.connectionState !== 'connected') {
+            console.log("Connection timeout - retrying...");
+            createOffer();
+        }
+    }, 3000); // 3초 대기 후 재시도
+
     // Add tracks
-    localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-    });
+    if (localStream) {
+        localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+        });
+    }
 
     // ICE Candidates
     peerConnection.onicecandidate = (event) => {
@@ -102,9 +129,13 @@ async function createOffer() {
     };
 
     // Create Offer
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    socket.emit('offer', offer);
+    try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit('offer', offer);
+    } catch (e) {
+        console.error("Error creating offer:", e);
+    }
 }
 
 // Handle Answer from Laptop
